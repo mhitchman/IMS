@@ -1,5 +1,7 @@
 public class MIDIHelp{
 
+	0 => int port;
+
 	144 => int midiChannel1NoteOn; // status byte for note on message to channel 1
 	// other channels can be calculated by adding 1 - 15
 	

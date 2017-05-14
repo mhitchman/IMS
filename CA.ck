@@ -1,8 +1,10 @@
 public class CA{
     
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int cells[];
-    [4, 3, 2, 1, -1, -1, -1, -1] @=> int mask[];
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int nextGen[];
+	// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int cells[];
+	// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int nextGen[];
+	[0,0,0,0] @=> int cells[];
+	[0,0,0,0] @=> int nextGen[];
+	[4, 3, 2, 1, -1, -1, -1, -1] @=> int mask[];
     
     fun void setCellState(int position, int value)
     {
@@ -98,31 +100,28 @@ public class CA{
            cellIndex++;
        }
        nextToCurrentGen();       
-    }     
+   }
+
+   fun int convertToBase10()
+   {
+	   // treats the cells array as a binary number and converts to base 10
+	   // that binary number is considered to be big-endian
+	   
+	   cells.size() => int arraySize;
+
+	   float MSB; // most significant bit 
+	   Math.pow(2, arraySize - 1) => MSB; // arraySize - 1 because starts on the 0th element
+	   //needs to treat least significant bit as 0th element because 2^1 != 1
+
+	   0 => int totalValue;
+	   Std.ftoi(MSB) => int currentCellValue; // MSB will always be a whole number so can safely convert to int by truncation
+	   
+	   for (0 => int i; i < arraySize; i++) // for every element in cells
+	   {
+		   (cells[i] * (currentCellValue)) + totalValue => totalValue; // multiplies the current bit by its value then adds it to the total value of the cell
+		   currentCellValue / 2 => currentCellValue; // sets the cell value in preparation for the next loop
+	   }
+	   
+	   return totalValue;
+   }
 }
-
-// CA caObject;
-
-// [0,0,0,0,0,1,0,0,0,0,0] @=> int initialCells[];
-
-// caObject.getCellArrSize() => int cellSize;
-
-// for (0 => int i; i < cellSize; i++)
-// {
-//     caObject.setCellState(i, initialCells[i]);
-// }
-
-// for (0 => int x; x < 20; x++)
-// {
-//     caObject.calculateNextGen();
-
-// <<< "Second" >>>;
-// for(0 => int i; i < cellSize; i++)
-// {
-//     <<< caObject.getCellState(i) >>>;
-// }
-
-// 10::second => now;
-
-// }
-

@@ -1,30 +1,51 @@
-0.5::second => dur quarter;
-0.25 * quarter => dur eighth;
+BPM bpmObj;
+MIDIHelp mhelp;
 
-SinOsc imp => dac;
-Noise imp2 => dac;
+// 0.5::second => dur quarter;
+// 0.25 * quarter => dur eighth;
 
-650 => imp.freq;
-0 => imp.gain;
-// 440 => imp2.freq;
-0 => imp2.gain;
+// SinOsc imp => dac;
+// Noise imp2 => dac;
 
-fun void stopNote(SinOsc osc, dur length)
+// 650 => imp.freq;				
+// 0 => imp.gain;
+
+// 0 => imp2.gain;
+
+// fun void stopNote(SinOsc osc, dur length)
+// {
+// 	length => now;
+// 	0.0 => osc.gain;
+// }
+
+// fun void stopNoise(Noise osc, dur length)
+// {
+// 	length => now;
+// 	0.0 => osc.gain;
+// }
+
+MidiOut mout;
+mhelp.port => int midiPort;
+
+if ( !mout.open(midiPort))
 {
-	length => now;
-	0.0 => osc.gain;
+	<<< "(interCreate.ck) Error: MIDI port did not open on port: ", midiPort >>>;
+	me.exit();
 }
 
-fun void stopNoise(Noise osc, dur length)
+MidiMsg msg;
+
+fun void playNote(int notePitch, dur noteLength, int channel)
 {
-	length => now;
-	0.0 => osc.gain;
+	mhelp.midiNoteOn(notePitch, 126, channel, msg, mout);
+	noteLength => now;
+	mhelp.midiNoteOff(notePitch, 126, channel, msg, mout);
 }
 
 fun void rhy1()
 {
 	CA caObject;
-	[0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0] @=> int initialCells[];
+	[0,0,0,1] @=> int initialCells[];
 	[5, 4, 2, 1, 6, -1, -1, -1] @=> int initialMasks[]; 
 	
 	caObject.getCellArrSize() => int cellSize;
@@ -44,10 +65,11 @@ fun void rhy1()
 		{
 			if (caObject.getCellState(i) == 1)
 			{
-				0.02 => imp.gain;
-				spork ~ stopNote(imp, 0.08 * quarter);
+				// 0.02 => imp.gain;
+				// spork ~ stopNote(imp, 0.08 * quarter);
+				playNote(62, bpmObj.sixteenthNote, 1);
 			}
-			eighth => now;
+			bpmObj.sixteenthNote => now;
 		}
 		caObject.calculateNextGen();
 	}
@@ -56,7 +78,7 @@ fun void rhy1()
 fun void rhy2()
 {
 	CA caObject2;
-	[1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1,0,0,0,1,0,1] @=> int initialCells[];
+	[1,1,1,0] @=> int initialCells[];
 	[5, 4, 2, 1, -1, -1, -1, -1] @=> int initialMasks[]; 
 	caObject2.getCellArrSize() => int cellSize;
 	for (0 => int i; i < cellSize; i++)
@@ -73,12 +95,14 @@ fun void rhy2()
 	{
 		for(0 => int i; i < cellSize; i++)
 		{
+			<<< "CARhy: ", caObject2.getCellState(i) >>>; 
 			if (caObject2.getCellState(i) == 1)
 			{
-				0.02 => imp2.gain;
-				spork ~ stopNoise(imp2, 0.05 * quarter);
+				// 0.02 => imp2.gain;
+				// spork ~ stopNoise(imp2, 0.05 * quarter);
+				playNote(67, bpmObj.sixteenthNote, 1);
 			}
-			eighth => now;
+			bpmObj.sixteenthNote => now; // so waits if the cell is 0
 		}
 		caObject2.calculateNextGen();
 	}
@@ -89,5 +113,5 @@ spork ~ rhy2();
 
 while(true)
 {
-	1::second => now;
+	10::second => now; // this just keeps the shred alive so the children above stay alive
 }
