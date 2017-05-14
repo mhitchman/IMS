@@ -7,7 +7,7 @@ MIDIHelp mhelp;
 // MIDI Stuff //
 
 MidiOut mout;
-0 => int midiPort;
+mhelp.port => int midiPort;
 
 if (!mout.open(midiPort))
 {
@@ -18,8 +18,17 @@ if (!mout.open(midiPort))
 MidiMsg msg;
 
 // Note stuff //
+[
+[0, 1, 1, 2],
+[0, 1, 2, 2],
+[0, 1, 2, 1],
+[0, 0, 1, 2],
+[2, 1, 2, 0],
+[0, 2, 1, 2]
+] @=> int notePattern[][]; // a series of different patterns to break the notes into
+5 => int numberOfNotePatterns; // number of largest first element of note pattern array. Used for randoming picking pattern to choose
+0 => int notePatternChoice; // to select the pattern to use from the above array
 
-[0, 1, 1, 2] @=> int notePattern[];
 [bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote] @=> dur durPattern[];
 
 int intervalNotes[3];
@@ -39,9 +48,7 @@ while (true)
 {
 
 	caObject1.convertToBase10() => int interval1;
-	<<< "interval 1: ", interval1 >>>;
 	caObject2.convertToBase10() => int interval2;
-	<<< "interval 2: ", interval2 >>>;
 
 	wrapLargeIntervals(interval1) => interval1;
 	wrapLargeIntervals(interval2) => interval2;
@@ -50,14 +57,15 @@ while (true)
 	scaleObj.scaleIntervals[interval1] => intervalNotes[1];
 	scaleObj.scaleIntervals[interval2] => intervalNotes[2];
 
-
+	Math.random2(0, numberOfNotePatterns) => notePatternChoice; // randomly pick a pattern from the possible number
+	
 	//durPattern.size(bpmObj.quarterNote);
 	for (0 => int x; x < 4; x++)
 	{
- 		for (0 => int i; i < notePattern.size(); i++)
+ 		for (0 => int i; i < 4; i++) // 4 is the number of notes in the pattern
  		{
  			// playNote(notePattern[i], durPattern[i]);
-			playNote(intervalNotes[notePattern[i]], durPattern[i]);
+			playNote(intervalNotes[notePattern[notePatternChoice][i]], durPattern[i]);
 		}
 	}
 
@@ -87,5 +95,3 @@ fun void playNote(int notePitch, dur noteLength)
 	noteLength => now;
 	mhelp.midiNoteOff(notePitch, 126, 0, msg, mout);
 }
-
-
