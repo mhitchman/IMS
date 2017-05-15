@@ -17,7 +17,30 @@ if (!mout.open(midiPort))
 
 MidiMsg msg;
 
-// Note stuff //
+// Markhov Model stuff //
+
+int currentNote;
+[
+[2,2,4,4,5,5,3,6,7,1],
+[3,3,4,4,5,5,1,2,6,0],
+[0,0,4,4,6,6,1,2,3,5],
+[0,0,1,1,5,5,2,3,4,6],
+[0,0,1,1,2,2,3,4,5,6],
+[1,1,2,2,3,3,4,5,6,7],
+[2,2,4,4,5,5,1,3,6,0],
+[3,3,4,4,5,5,0,1,2,6]
+] @=> int rootNoteProbs[][]; // the number of each row element corresponds to the note number in scaleObj's scaleInterval's array
+// currentNote is used to choose a row
+// The contents of each cell are destination notes
+// A random number is generated between 0 and 9 which then is used to choose a column thus giving the next note
+// the more times a number appears in the row the higher percentage that it will be the next state
+
+fun int returnNextNote()
+{
+	return rootNoteProbs[currentNote][Math.random2(0, 9)];
+}
+
+// Note pattern stuff //
 [
 [0, 1, 1, 2],
 [0, 1, 2, 2],
@@ -46,32 +69,46 @@ for (0 => int i; i < cellSize; i++)
 
 while (true)
 {
-
-	caObject1.convertToBase10() => int interval1;
-	caObject2.convertToBase10() => int interval2;
-
-	wrapLargeIntervals(interval1) => interval1;
-	wrapLargeIntervals(interval2) => interval2;
-
-	scaleObj.keyScale => intervalNotes[0];
-	scaleObj.scaleIntervals[interval1] => intervalNotes[1];
-	scaleObj.scaleIntervals[interval2] => intervalNotes[2];
-
-	Math.random2(0, numberOfNotePatterns) => notePatternChoice; // randomly pick a pattern from the possible number
-	
-	//durPattern.size(bpmObj.quarterNote);
-	for (0 => int x; x < 4; x++)
+	if (interfaceEnable.intervalsEnabled == true) // if the voice is disabled then there's no point doing all the calculations
 	{
- 		for (0 => int i; i < 4; i++) // 4 is the number of notes in the pattern
- 		{
- 			// playNote(notePattern[i], durPattern[i]);
-			playNote(intervalNotes[notePattern[notePatternChoice][i]], durPattern[i]);
+		scaleObj.regenScale(); // if the key got changed we need to regenerate the scale here before it starts all the interval calculations and before the next bar
+		
+		caObject1.convertToBase10() => int interval1;
+		caObject2.convertToBase10() => int interval2;
+
+		wrapLargeIntervals(interval1) => interval1;
+		wrapLargeIntervals(interval2) => interval2;
+
+		// get the intervals in relation to whatever the current first note is
+		// this will likely go above the range of scaleIntervals so it is wrapped again
+		wrapLargeIntervals(interval1 + currentNote) => interval1;
+		wrapLargeIntervals(interval2 + currentNote) => interval2;
+
+		scaleObj.scaleIntervals[currentNote] => intervalNotes[0];
+		scaleObj.scaleIntervals[interval1] => intervalNotes[1];
+		scaleObj.scaleIntervals[interval2] => intervalNotes[2];
+
+		returnNextNote() => currentNote; // setup the next note once it's been used
+
+		Math.random2(0, numberOfNotePatterns) => notePatternChoice; // randomly pick a pattern from the possible number
+		
+		//durPattern.size(bpmObj.quarterNote);
+		for (0 => int x; x < 4; x++)
+		{
+ 			for (0 => int i; i < 4; i++) // 4 is the number of notes in the pattern
+ 			{
+ 				// playNote(notePattern[i], durPattern[i]);
+				playNote(intervalNotes[notePattern[notePatternChoice][i]], durPattern[i]);
+			}
 		}
+
+		caObject1.calculateNextGen();
+		caObject2.calculateNextGen();
 	}
-
-	caObject1.calculateNextGen();
-	caObject2.calculateNextGen();
-
+	else
+	{
+		bpmObj.quarterNote => now; // even if it is disabled we still want it to be in time
+	}
 }
 
 fun int wrapLargeIntervals(int interval)

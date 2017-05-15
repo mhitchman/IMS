@@ -44,6 +44,7 @@ fun void playNote(int notePitch, dur noteLength, int channel)
 
 fun void rhy1()
 {
+
 	CA caObject;
 	[0,0,0,1] @=> int initialCells[];
 	[5, 4, 2, 1, 6, -1, -1, -1] @=> int initialMasks[]; 
@@ -61,22 +62,32 @@ fun void rhy1()
 
 	while(true)
 	{
-		for(0 => int i; i < cellSize; i++)
+		if (interfaceEnable.rhythm1Enabled == true)
 		{
-			if (caObject.getCellState(i) == 1)
+			for(0 => int i; i < cellSize; i++)
 			{
-				// 0.02 => imp.gain;
-				// spork ~ stopNote(imp, 0.08 * quarter);
-				playNote(62, bpmObj.sixteenthNote, 1);
+				if (caObject.getCellState(i) == 1)
+				{
+					// 0.02 => imp.gain;
+					// spork ~ stopNote(imp, 0.08 * quarter);
+					playNote(62, bpmObj.sixteenthNote, 1);
+				}
+				bpmObj.sixteenthNote => now;
 			}
-			bpmObj.sixteenthNote => now;
+			caObject.calculateNextGen();
 		}
-		caObject.calculateNextGen();
+		else
+		{
+			bpmObj.quarterNote => now;
+		}
 	}
+
+
 }
 
 fun void rhy2()
 {
+
 	CA caObject2;
 	[1,1,1,0] @=> int initialCells[];
 	[5, 4, 2, 1, -1, -1, -1, -1] @=> int initialMasks[]; 
@@ -93,19 +104,26 @@ fun void rhy2()
 
 	while(true)
 	{
-		for(0 => int i; i < cellSize; i++)
+		if (interfaceEnable.rhythm2Enabled == true) // check the controls have enabled it
 		{
-			<<< "CARhy: ", caObject2.getCellState(i) >>>; 
-			if (caObject2.getCellState(i) == 1)
+			for(0 => int i; i < cellSize; i++)
 			{
-				// 0.02 => imp2.gain;
-				// spork ~ stopNoise(imp2, 0.05 * quarter);
-				playNote(67, bpmObj.sixteenthNote, 1);
+				if (caObject2.getCellState(i) == 1)
+				{
+					// 0.02 => imp2.gain;
+					// spork ~ stopNoise(imp2, 0.05 * quarter);
+					playNote(67, bpmObj.sixteenthNote, 1);
+				}
+				bpmObj.sixteenthNote => now; // so waits if the cell is 0
 			}
-			bpmObj.sixteenthNote => now; // so waits if the cell is 0
+			caObject2.calculateNextGen();
 		}
-		caObject2.calculateNextGen();
+		else
+		{
+			bpmObj.quarterNote => now; // still want it to stay in time even when disabled
+		}
 	}
+
 }
 
 spork ~ rhy1();
