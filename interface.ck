@@ -14,6 +14,17 @@ public class interfaceEnable
 	static int rhythm2Enabled;
 
 	static int intervalsEnabled;
+
+
+	// need to get the status of the interface Rhythm CA multibutton to the CA cells being used in CARhythm.ck but want to keep all the interface stuff together 
+	// chuck doesn't support static arrays so an array couldn't be shared between objects
+	// the workaround is to treat the interface object as displaying a binary number and store the base 10 equivalent in the below int
+	// another int is set to tell the functions in CARhythm.ck whether or not to use that total
+	// when it should use it, the base 10 number is converted back to binary and stored in the relevant CA array
+	
+	static int RhythmCAInterfaceTotal; // stores the base 10 equivalent of the Rhythm CA array
+	static int useRhythmCATotal1; // flag for whether CARhythm rhy1 function should actually use the above total to assign to the CA cells
+	static int useRhythmCATotal2; // flag for whether CARhythm rhy2 function should actually use the above total to assign to the CA cells
 }
 
 
@@ -108,6 +119,61 @@ while (true)
 			{
 				false => interfaceEnable.intervalsEnabled;
 			}
+		}
+
+		else if (msg.address == "/1/RhythmCA/1/1")
+		{
+			if (Std.ftoi(msg.getFloat(0)) == 1)
+			{
+				interfaceEnable.RhythmCAInterfaceTotal + 8 => interfaceEnable.RhythmCAInterfaceTotal;
+			}
+			else
+			{
+				interfaceEnable.RhythmCAInterfaceTotal - 8 => interfaceEnable.RhythmCAInterfaceTotal;				
+			}
+		}
+		
+		else if (msg.address == "/1/RhythmCA/2/1")
+		{
+			<<< "Hello? " >>>;
+			if (Std.ftoi(msg.getFloat(0)) == 1)
+			{
+				interfaceEnable.RhythmCAInterfaceTotal + 4 => interfaceEnable.RhythmCAInterfaceTotal;
+			}
+			else
+			{
+				interfaceEnable.RhythmCAInterfaceTotal - 4 => interfaceEnable.RhythmCAInterfaceTotal;				
+			}
+		}
+		else if (msg.address == "/1/RhythmCA/3/1")
+		{
+			if (Std.ftoi(msg.getFloat(0)) == 1)
+			{
+				interfaceEnable.RhythmCAInterfaceTotal + 2 => interfaceEnable.RhythmCAInterfaceTotal;
+			}
+			else
+			{
+				interfaceEnable.RhythmCAInterfaceTotal - 2 => interfaceEnable.RhythmCAInterfaceTotal;				
+			}
+		}
+		else if (msg.address == "/1/RhythmCA/4/1")
+		{
+			if (Std.ftoi(msg.getFloat(0)) == 1)
+			{
+				interfaceEnable.RhythmCAInterfaceTotal + 1 => interfaceEnable.RhythmCAInterfaceTotal;
+			}
+			else
+			{
+				interfaceEnable.RhythmCAInterfaceTotal - 1 => interfaceEnable.RhythmCAInterfaceTotal;				
+			}
+		}
+		else if (msg.address == "/1/RhythmSend1")
+		{
+ 			true => interfaceEnable.useRhythmCATotal1;
+		}
+		else if (msg.address == "/1/RhythmSend2")
+		{
+			true => interfaceEnable.useRhythmCATotal2;
 		}
 	}
 }

@@ -7,7 +7,6 @@ public class BPM
 	fun void tempo(float beat)
 	{
 		// beat argument is BPM
-
 		60.0/(beat) => float SPB; // seconds per beat
 		SPB :: second => quarterNote;
 		quarterNote*0.5 => eighthNote;

@@ -42,6 +42,27 @@ fun void playNote(int notePitch, dur noteLength, int channel)
 	mhelp.midiNoteOff(notePitch, 126, channel, msg, mout);
 }
 
+fun int base10toBinary(int base10, CA cellObject)
+{
+	// converts to binary and then assigns it to the CA cell array
+	int binarySolution[4];
+
+	if (base10 <= 15) // if the base 10 number is greater than 15 there's an issue somewhere
+	{
+		for (3 => int i; i >= 0; i--) // assuming it's a 4 bit cell. Counts down because calculation results in binary number backwards
+		{
+			base10 % 2 => binarySolution[i];
+			base10 / 2 => base10;
+		}
+	}
+
+	for (0 => int i; i < 4; i++)
+	{
+		cellObject.setCellState(i, binarySolution[i]);
+	}
+	
+}
+
 fun void rhy1()
 {
 
@@ -64,17 +85,32 @@ fun void rhy1()
 	{
 		if (interfaceEnable.rhythm1Enabled == true)
 		{
-			for(0 => int i; i < cellSize; i++)
+			if (interfaceEnable.useRhythmCATotal1 == false)
 			{
-				if (caObject.getCellState(i) == 1)
+				// DEBUG
+				// for(0 => int i; i< cellSize; i++)
+				// {
+				// 	<<< caObject.getCellState(i) >>> ;
+				// }
+				// DEBUG
+				for(0 => int i; i < cellSize; i++)
 				{
-					// 0.02 => imp.gain;
-					// spork ~ stopNote(imp, 0.08 * quarter);
-					playNote(62, bpmObj.sixteenthNote, 1);
+					if (caObject.getCellState(i) == 1)
+					{
+						// 0.02 => imp.gain;
+						// spork ~ stopNote(imp, 0.08 * quarter);
+						playNote(62, bpmObj.sixteenthNote, 1);
+					}
+					bpmObj.sixteenthNote => now;
 				}
-				bpmObj.sixteenthNote => now;
+				caObject.calculateNextGen();
 			}
-			caObject.calculateNextGen();
+			else
+			{
+				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject);
+				false => interfaceEnable.useRhythmCATotal1;
+				bpmObj.quarterNote => now;
+			}
 		}
 		else
 		{
@@ -106,17 +142,26 @@ fun void rhy2()
 	{
 		if (interfaceEnable.rhythm2Enabled == true) // check the controls have enabled it
 		{
-			for(0 => int i; i < cellSize; i++)
+			if (interfaceEnable.useRhythmCATotal2 == false)
 			{
-				if (caObject2.getCellState(i) == 1)
+				for(0 => int i; i < cellSize; i++)
 				{
-					// 0.02 => imp2.gain;
-					// spork ~ stopNoise(imp2, 0.05 * quarter);
-					playNote(67, bpmObj.sixteenthNote, 1);
+					if (caObject2.getCellState(i) == 1)
+					{
+						// 0.02 => imp2.gain;
+						// spork ~ stopNoise(imp2, 0.05 * quarter);
+						playNote(67, bpmObj.sixteenthNote, 1);
+					}
+					bpmObj.sixteenthNote => now; // so waits if the cell is 0
 				}
-				bpmObj.sixteenthNote => now; // so waits if the cell is 0
+				caObject2.calculateNextGen();
 			}
-			caObject2.calculateNextGen();
+			else
+			{
+				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject2);
+				false => interfaceEnable.useRhythmCATotal2;
+				bpmObj.quarterNote => now;
+			}
 		}
 		else
 		{
