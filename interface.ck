@@ -1,6 +1,8 @@
 OscHelper oscObj;
 Scale scaleObj;
 
+interfaceEnable ie; // do this to get all the values to initalise properly. Don't actually need to use it
+
 BPM bpmObj;
 
 OscIn oin; // OSC message receiver
@@ -25,6 +27,21 @@ public class interfaceEnable
 	static int RhythmCAInterfaceTotal; // stores the base 10 equivalent of the Rhythm CA array
 	static int useRhythmCATotal1; // flag for whether CARhythm rhy1 function should actually use the above total to assign to the CA cells
 	static int useRhythmCATotal2; // flag for whether CARhythm rhy2 function should actually use the above total to assign to the CA cells
+
+
+	// same problem with static arrays for Rhythm Mask but since want base 10 numbers from the interface can't got storing it as a single number
+	// instead have to have 8 seperate ints
+	-1 => static int maskCell0;
+	-1 => static int maskCell1;
+	-1 => static int maskCell2;
+	-1 => static int maskCell3;
+	-1 => static int maskCell4;
+	-1 => static int maskCell5;
+	-1 => static int maskCell6;
+	-1 => static int maskCell7;
+
+	-1 => static int useMaskCells1;
+	-1 => static int useMaskCells2;
 }
 
 
@@ -135,7 +152,6 @@ while (true)
 		
 		else if (msg.address == "/1/RhythmCA/2/1")
 		{
-			<<< "Hello? " >>>;
 			if (Std.ftoi(msg.getFloat(0)) == 1)
 			{
 				interfaceEnable.RhythmCAInterfaceTotal + 4 => interfaceEnable.RhythmCAInterfaceTotal;
@@ -174,6 +190,48 @@ while (true)
 		else if (msg.address == "/1/RhythmSend2")
 		{
 			true => interfaceEnable.useRhythmCATotal2;
+		}
+
+		// the rhythm mask buttons output the actual values we want so the outputs can just be fed straight into the relevant variable
+		else if (msg.address == "/1/RhythmMask0")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell0;
+		}
+		else if (msg.address == "/1/RhythmMask1")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell1;
+		}
+		else if (msg.address == "/1/RhythmMask2")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell2;
+		}
+		else if (msg.address == "/1/RhythmMask3")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell3;
+		}
+		else if (msg.address == "/1/RhythmMask4")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell4;
+		}
+		else if (msg.address == "/1/RhythmMask5")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell5;
+		}
+		else if (msg.address == "/1/RhythmMask6")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell6;
+		}
+		else if (msg.address == "/1/RhythmMask7")
+		{
+			Std.ftoi(msg.getFloat(0)) => interfaceEnable.maskCell7;
+		}
+		else if (msg.address == "/1/RhythmMaskSend1")
+		{
+			true => interfaceEnable.useMaskCells1;
+		}
+		else if (msg.address == "/1/RhythmMaskSend2")
+		{
+			true => interfaceEnable.useMaskCells2;
 		}
 	}
 }

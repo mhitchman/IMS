@@ -63,6 +63,19 @@ fun int base10toBinary(int base10, CA cellObject)
 	
 }
 
+fun void useInterfaceMaskCells(CA cellObject)
+{
+	
+	cellObject.setMaskValues(0, interfaceEnable.maskCell0);
+	cellObject.setMaskValues(1, interfaceEnable.maskCell1);
+	cellObject.setMaskValues(2, interfaceEnable.maskCell2);
+	cellObject.setMaskValues(3, interfaceEnable.maskCell3);
+	cellObject.setMaskValues(4, interfaceEnable.maskCell4);
+	cellObject.setMaskValues(5, interfaceEnable.maskCell5);
+	cellObject.setMaskValues(6, interfaceEnable.maskCell6);	
+	cellObject.setMaskValues(7, interfaceEnable.maskCell7);
+}
+
 fun void rhy1()
 {
 
@@ -83,34 +96,34 @@ fun void rhy1()
 
 	while(true)
 	{
+	
 		if (interfaceEnable.rhythm1Enabled == true)
 		{
-			if (interfaceEnable.useRhythmCATotal1 == false)
+			if (interfaceEnable.useRhythmCATotal1 == true)
 			{
-				// DEBUG
-				// for(0 => int i; i< cellSize; i++)
-				// {
-				// 	<<< caObject.getCellState(i) >>> ;
-				// }
-				// DEBUG
+				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject);
+				false => interfaceEnable.useRhythmCATotal1;
+				bpmObj.quarterNote => now; // keep it in time
+			}
+			else if (interfaceEnable.useMaskCells1 == true)
+			{
+				useInterfaceMaskCells(caObject);
+				false => interfaceEnable.useMaskCells1;
+				bpmObj.quarterNote => now;
+			}
+			else 
+			{
 				for(0 => int i; i < cellSize; i++)
 				{
 					if (caObject.getCellState(i) == 1)
 					{
-						// 0.02 => imp.gain;
-						// spork ~ stopNote(imp, 0.08 * quarter);
 						playNote(62, bpmObj.sixteenthNote, 1);
 					}
 					bpmObj.sixteenthNote => now;
 				}
 				caObject.calculateNextGen();
 			}
-			else
-			{
-				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject);
-				false => interfaceEnable.useRhythmCATotal1;
-				bpmObj.quarterNote => now;
-			}
+
 		}
 		else
 		{
@@ -142,7 +155,19 @@ fun void rhy2()
 	{
 		if (interfaceEnable.rhythm2Enabled == true) // check the controls have enabled it
 		{
-			if (interfaceEnable.useRhythmCATotal2 == false)
+			if (interfaceEnable.useRhythmCATotal2)
+			{
+				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject2);
+				false => interfaceEnable.useRhythmCATotal2;
+				bpmObj.quarterNote => now;
+			}
+			else if (interfaceEnable.useMaskCells2 == true)
+			{
+				useInterfaceMaskCells(caObject2);
+				false => interfaceEnable.useMaskCells2;
+				bpmObj.quarterNote => now;
+			}
+			else
 			{
 				for(0 => int i; i < cellSize; i++)
 				{
@@ -156,12 +181,7 @@ fun void rhy2()
 				}
 				caObject2.calculateNextGen();
 			}
-			else
-			{
-				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject2);
-				false => interfaceEnable.useRhythmCATotal2;
-				bpmObj.quarterNote => now;
-			}
+
 		}
 		else
 		{
