@@ -92,8 +92,7 @@ while (true)
 
 		Math.random2(0, numberOfNotePatterns) => notePatternChoice; // randomly pick a pattern from the possible number
 		
-		//durPattern.size(bpmObj.quarterNote);
-		for (0 => int x; x < 4; x++)
+		for (0 => int x; x < 2; x++)
 		{
  			for (0 => int i; i < 4; i++) // 4 is the number of notes in the pattern
  			{
