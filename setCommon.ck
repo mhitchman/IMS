@@ -1,3 +1,5 @@
+// to initialise some of the static variables to sensible values
+
 Scale scaleObj;
 60 => scaleObj.keyScale;
 scaleObj.regenScale();

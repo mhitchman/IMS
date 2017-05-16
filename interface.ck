@@ -1,27 +1,26 @@
 OscHelper oscObj;
 Scale scaleObj;
 
-interfaceEnable ie; // do this to get all the values to initalise properly. Don't actually need to use it
+interfaceEnable ie; // do this to get all the values to initalise properly. Don't actually need to use it since all the variables it contains are static
 
 BPM bpmObj;
 
-OscIn oin; // OSC message receiver
+OscIn oin; // class to handle OSC message receiving
 OscMsg msg; // where the OSC message will be stored
 oscObj.oscPort => oin.port; // port to listen for OSC messages
-oin.listenAll(); // listen to all OSC messages
+oin.listenAll(); // listen for all OSC messages rather than ones with specific address's
 
 public class interfaceEnable
 {
-	static int rhythm1Enabled;
-	static int rhythm2Enabled;
+	static int rhythm1Enabled; // if true rhythm1 is enabled and does processing and MIDI message sending
+	static int rhythm2Enabled; // same for rhythm2
 
-	static int intervalsEnabled;
+	static int intervalsEnabled; // same for the intervals voice
 
-
-	// need to get the status of the interface Rhythm CA multibutton to the CA cells being used in CARhythm.ck but want to keep all the interface stuff together 
+	// need to get the status of the interface Rhythm CA multibutton to the CA cells being used in CARhythm.ck but want to keep all the interface stuff here
 	// chuck doesn't support static arrays so an array couldn't be shared between objects
 	// the workaround is to treat the interface object as displaying a binary number and store the base 10 equivalent in the below int
-	// another int is set to tell the functions in CARhythm.ck whether or not to use that total
+	// rhythm[1/2]Enabled is set to tell the functions in CARhythm.ck whether or not to use that total
 	// when it should use it, the base 10 number is converted back to binary and stored in the relevant CA array
 	
 	static int RhythmCAInterfaceTotal; // stores the base 10 equivalent of the Rhythm CA array
@@ -30,7 +29,8 @@ public class interfaceEnable
 
 
 	// same problem with static arrays for Rhythm Mask but since want base 10 numbers from the interface can't got storing it as a single number
-	// instead have to have 8 seperate ints
+	// instead have to have 8 separate ints
+	// initialised as -1 as means that rule won't be used for the CA mask
 	-1 => static int maskCell0;
 	-1 => static int maskCell1;
 	-1 => static int maskCell2;
@@ -40,11 +40,11 @@ public class interfaceEnable
 	-1 => static int maskCell6;
 	-1 => static int maskCell7;
 
-	-1 => static int useMaskCells1;
-	-1 => static int useMaskCells2;
+	static int useMaskCells1; // flat whether to use the values stored above
+	static int useMaskCells2;
 }
 
-
+// loops infinitely receiving OSC messages checking it's address and acting accordingly
 while (true)
 {
 	oin => now; // wait for OSC message
@@ -55,7 +55,7 @@ while (true)
 		{
 			bpmObj.tempo(Std.ftoi(msg.getFloat(0))); // change the tempo to whatever is being sent by the tempo slider
 		}
-		else if (msg.address == "/1/key1")
+		else if (msg.address == "/1/key1") // key messages are used to change the key of the interval voice using the scale object
 		{
 			60 => scaleObj.keyScale;
 		}

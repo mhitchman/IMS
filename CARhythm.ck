@@ -1,29 +1,7 @@
 BPM bpmObj;
 MIDIHelp mhelp;
 
-// 0.5::second => dur quarter;
-// 0.25 * quarter => dur eighth;
-
-// SinOsc imp => dac;
-// Noise imp2 => dac;
-
-// 650 => imp.freq;				
-// 0 => imp.gain;
-
-// 0 => imp2.gain;
-
-// fun void stopNote(SinOsc osc, dur length)
-// {
-// 	length => now;
-// 	0.0 => osc.gain;
-// }
-
-// fun void stopNoise(Noise osc, dur length)
-// {
-// 	length => now;
-// 	0.0 => osc.gain;
-// }
-
+// Creating the midi handling class and setup port
 MidiOut mout;
 mhelp.port => int midiPort;
 
@@ -32,9 +10,9 @@ if ( !mout.open(midiPort))
 	<<< "(interCreate.ck) Error: MIDI port did not open on port: ", midiPort >>>;
 	me.exit();
 }
-
 MidiMsg msg;
 
+// function to make it easy to play a midi note and stop it after noteLength using the functions created in MIDIHelper.ck
 fun void playNote(int notePitch, dur noteLength, int channel)
 {
 	mhelp.midiNoteOn(notePitch, 126, channel, msg, mout);
@@ -42,9 +20,11 @@ fun void playNote(int notePitch, dur noteLength, int channel)
 	mhelp.midiNoteOff(notePitch, 126, channel, msg, mout);
 }
 
+
+// converts to binary and then assigns it to the CA cell array see interface.ck for reason
 fun int base10toBinary(int base10, CA cellObject)
 {
-	// converts to binary and then assigns it to the CA cell array
+
 	int binarySolution[4];
 
 	if (base10 <= 15) // if the base 10 number is greater than 15 there's an issue somewhere
@@ -56,14 +36,14 @@ fun int base10toBinary(int base10, CA cellObject)
 		}
 	}
 
-	for (0 => int i; i < 4; i++)
+	for (0 => int i; i < 4; i++) // assign the calculated binary to the actual cell array
 	{
 		cellObject.setCellState(i, binarySolution[i]);
 	}
 	
 }
 
-fun void useInterfaceMaskCells(CA cellObject)
+fun void useInterfaceMaskCells(CA cellObject) // assign the values collected from the interface to the mask array to change the rules being used by the CA
 {
 	
 	cellObject.setMaskValues(0, interfaceEnable.maskCell0);
@@ -76,9 +56,10 @@ fun void useInterfaceMaskCells(CA cellObject)
 	cellObject.setMaskValues(7, interfaceEnable.maskCell7);
 }
 
-fun void rhy1()
+fun void rhy1() // function for the first rhythm instrument
 {
 
+	// Sets up the starting cell array and the CA rules to use
 	CA caObject;
 	[0,0,0,1] @=> int initialCells[];
 	[5, 4, 2, 1, 6, -1, -1, -1] @=> int initialMasks[]; 
@@ -94,18 +75,19 @@ fun void rhy1()
 		caObject.setMaskValues(i, initialMasks[i]);
 	}
 
+	// main loop where noise is made
 	while(true)
 	{
 	
-		if (interfaceEnable.rhythm1Enabled == true)
+		if (interfaceEnable.rhythm1Enabled == true) // checks that the voice is actually enabled before bothering with any of the caculations
 		{
-			if (interfaceEnable.useRhythmCATotal1 == true)
+			if (interfaceEnable.useRhythmCATotal1 == true) // if the interface has signalled that this voice should use the interface CA cells then it should access them and do that 
 			{
-				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject);
-				false => interfaceEnable.useRhythmCATotal1;
-				bpmObj.quarterNote => now; // keep it in time
+				base10toBinary(interfaceEnable.RhythmCAInterfaceTotal, caObject); // calls the conversion function with the caObject that this voice uses so it can access the cells being used by this voice
+				false => interfaceEnable.useRhythmCATotal1; // flag needs to be changed back to false so the voice doesn't repeatedly set the CA cells
+				bpmObj.quarterNote => now; // keep it in time since voice does this instead of play a note
 			}
-			else if (interfaceEnable.useMaskCells1 == true)
+			else if (interfaceEnable.useMaskCells1 == true) // similar as previous but for the mask array 
 			{
 				useInterfaceMaskCells(caObject);
 				false => interfaceEnable.useMaskCells1;
@@ -115,26 +97,27 @@ fun void rhy1()
 			{
 				for(0 => int i; i < cellSize; i++)
 				{
-					if (caObject.getCellState(i) == 1)
+					if (caObject.getCellState(i) == 1) // go through each cell in the array and if it's a 1 play a note
 					{
 						playNote(62, bpmObj.sixteenthNote, 1);
 					}
 					bpmObj.sixteenthNote => now;
 				}
-				caObject.calculateNextGen();
+				caObject.calculateNextGen(); // calculate the CA's next generation in preparation for the next loop
 			}
 
 		}
-		else
+		else 
 		{
-			bpmObj.quarterNote => now;
+			bpmObj.quarterNote => now; // if the voice isn't enabled the loop still needs to take time in order to stay in time with the other voices.
+			                           // also stops the loop from looping super fast and causing Chuck to hang
 		}
 	}
 
 
 }
 
-fun void rhy2()
+fun void rhy2() // second rhythm voice with the same structure as the first
 {
 
 	CA caObject2;
@@ -191,10 +174,11 @@ fun void rhy2()
 
 }
 
-spork ~ rhy1();
+// start the two voices on different "shreds" so they can run at different times
+spork ~ rhy1(); 
 spork ~ rhy2();
 
 while(true)
 {
-	10::second => now; // this just keeps the shred alive so the children above stay alive
+	10::second => now; // this just keeps this shred alive so the children above don't get killed
 }

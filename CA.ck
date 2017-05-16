@@ -1,10 +1,15 @@
 public class CA{
     
-	// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int cells[];
-	// [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] @=> int nextGen[];
 	[0,0,0,0] @=> int cells[];
 	[0,0,0,0] @=> int nextGen[];
-	[4, 3, 2, 1, -1, -1, -1, -1] @=> int mask[];
+
+	// since CA rules are configurations of 3 bits they can be stored as integers from 0-7
+	// 3 cells are taken from the CA cells array and converted to a base 10 number
+	// this is directly compared to each of the integers stored in mask, if they match then the rule applies and the "child" cell should be occupied
+	// this means mask only needs to have the rules that will result in a occupied cell
+	// there are 8 possible rules thus an 8 element array
+	// all unused cells are assigned to -1 since the lowest number that can be created using the cells from the CA is 0 (thus no chance of mistakenly matching unused elements)
+	[4, 3, 2, 1, -1, -1, -1, -1] @=> int mask[]; 
     
     fun void setCellState(int position, int value)
     {
@@ -27,14 +32,15 @@ public class CA{
         // all unused positions are negative numbers
         value => mask[position];
     }
-    
+
+	// function to find the "child" cell in the next generation based on the neighbours and given rule
     fun int getNextStateOfCell(int cellState, int lCellState, int rCellState, int rule)
     {
         0 => int nextCellState;
-        4 * lCellState + 2 * cellState + rCellState => int currentStateNum;
-        if ( currentStateNum == rule )
+        4 * lCellState + 2 * cellState + rCellState => int currentStateNum; // convert the 3 cells into a base10 number
+        if ( currentStateNum == rule ) // compare that base 10 number to the CA rule
         {
-            1 => nextCellState;
+            1 => nextCellState; 
         }
         
         else 
@@ -43,7 +49,8 @@ public class CA{
         }
         return nextCellState;
     }
-    
+
+	// function to wrap the ends of the array around so the CA doesn't seem to have an edge
     fun int findWraparoundValue(int outOfBoundsNeighbour)
     {
         0 => int wrappedNeighbour;
@@ -75,7 +82,7 @@ public class CA{
         }
     }
     
-    fun void calculateNextGen()
+    fun void calculateNextGen() // simple function that can be called from outside this class to easily calculate te next CA gen
     {
         //select cell and corresponding neighbours
         //call getNextStateOfCell for each mask position
