@@ -1,8 +1,8 @@
-// file to automatically load all components of the project
+// file to load all components of the project
 
-//****************//
-// Classes Files  //
-//****************//
+//**************//
+// Class Files  //
+//**************//
 Machine.add(me.dir()+"/CA.ck");
 Machine.add(me.dir()+"/BPM.ck");
 Machine.add(me.dir()+"/Scale.ck");

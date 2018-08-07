@@ -55,7 +55,9 @@ fun int returnNextNote()
 5 => int numberOfNotePatterns; // number of largest first element of note pattern array. Used for randoming picking a pattern 
 0 => int notePatternChoice; // to select the pattern to use from the above array
 
-[bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote] @=> dur durPattern[]; // duration for each not in the above pattern. keeping in an array makes changing per note/pattern easy
+
+// duration for each note in the above pattern. keeping in an array makes changing per note/pattern easy
+[bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote, bpmObj.quarterNote] @=> dur durPattern[];
 
 int intervalNotes[3]; // array for storing the actual MIDI numbers of the notes
 
@@ -113,7 +115,7 @@ while (true)
 	}
 	else
 	{
-		bpmObj.quarterNote => now; // even if the voice is disabled we still want it to be in time
+		bpmObj.quarterNote => now; // even if the voice is disabled we still want it to stay in time
 	}
 }
 
@@ -121,7 +123,7 @@ fun int wrapLargeIntervals(int interval)
 {
 
 	// the CA produces more values than there are intervals
-	// solution is to wrap around so numbers above 7 (the highest element in the array) start again at the beginning of the array
+	// solution is to wraparound so numbers above 7 (the highest element in the array) start again at the beginning of the array
 	// so each interval can be called by two values
 	// except 0, which technically can be called twice but the CA has died if it actually outputs a 0 so we all pray to the CA gods that it doesn't
 	

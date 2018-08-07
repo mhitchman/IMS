@@ -14,7 +14,7 @@ public class Scale{
 		}
 	}
 
-	// to initialise scaleIntervals using whatever keyScale has been set to when an object is crated
-	// this ensures that the array is the same across all objects since it can't be made static (Chuck limitation)
+	// to initialise scaleIntervals using whatever keyScale has been set to when an object is created
+	// this ensures that the array is the same across all objects since it can't be made static
 	regenScale(); 
 }

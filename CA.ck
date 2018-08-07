@@ -8,7 +8,7 @@ public class CA{
 	// this is directly compared to each of the integers stored in mask, if they match then the rule applies and the "child" cell should be occupied
 	// this means mask only needs to have the rules that will result in a occupied cell
 	// there are 8 possible rules thus an 8 element array
-	// all unused cells are assigned to -1 since the lowest number that can be created using the cells from the CA is 0 (thus no chance of mistakenly matching unused elements)
+	// all unused cells are assigned to -1 since the lowest number that can be created using the cells from the CA is 0
 	[4, 3, 2, 1, -1, -1, -1, -1] @=> int mask[]; 
     
     fun void setCellState(int position, int value)
@@ -28,8 +28,6 @@ public class CA{
     
     fun void setMaskValues(int position, int value)
     {
-        // in order to change rules
-        // all unused positions are negative numbers
         value => mask[position];
     }
 
@@ -73,7 +71,7 @@ public class CA{
         return wrappedNeighbour;
     }
     
-    fun void nextToCurrentGen() // moves next gen into current and wipes next gen so fresh for next step
+    fun void nextToCurrentGen() // moves next gen into current and wipes next gen
     {
         for(0 => int i; i < cells.size(); i++)
         {
@@ -82,12 +80,9 @@ public class CA{
         }
     }
     
-    fun void calculateNextGen() // simple function that can be called from outside this class to easily calculate te next CA gen
+    fun void calculateNextGen()
     {
-        //select cell and corresponding neighbours
-        //call getNextStateOfCell for each mask position
-        //set cellState in nextGen array
-        // increment cell position and repeat 
+       //select cell and corresponding neighbours 
        0 => int cellIndex;
        0 => int lCellIndex; 
        0 => int rCellIndex;
@@ -112,7 +107,7 @@ public class CA{
    fun int convertToBase10()
    {
 	   // treats the cells array as a binary number and converts to base 10
-	   // that binary number is considered to be big-endian
+	   // binary number is treated as big-endian
 	   
 	   cells.size() => int arraySize;
 

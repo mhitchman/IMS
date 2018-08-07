@@ -1,7 +1,6 @@
 BPM bpmObj;
 MIDIHelp mhelp;
 
-// Creating the midi handling class and setup port
 MidiOut mout;
 mhelp.port => int midiPort;
 

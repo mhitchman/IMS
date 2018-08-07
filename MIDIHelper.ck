@@ -7,7 +7,7 @@ public class MIDIHelp{
 	144 => int midiChannel1NoteOn; // status byte for note on message to channel 1
 	                               // other channels can be calculated by adding 1 - 15
 	
-	128 => int midiChannel1NoteOff; // status byte for note off messagte to channel 1
+	128 => int midiChannel1NoteOff; // status byte for note off message to channel 1
                                  	// other channels can be calculated by adding 1 - 15
 
 	// simple function to create a noteOn message, used throughout system
@@ -24,7 +24,7 @@ MidiMsg msg, MidiOut mout)
 
 fun void midiNoteOff(int note, int velocity, int channel, MidiMsg msg, MidiOut mout)
 {
-	// channel should equal MIDI channel number - 1 (channel 1 is already stored)
+	// channel should equal MIDI channel number - 1
 	
 	midiChannel1NoteOff + channel => msg.data1;
 	note => msg.data2;

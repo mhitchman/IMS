@@ -1,36 +1,35 @@
 OscHelper oscObj;
 Scale scaleObj;
 
-interfaceEnable ie; // do this to get all the values to initalise properly. Don't actually need to use it since all the variables it contains are static
+interfaceEnable ie; // make sure all member variables initalise properly.
 
 BPM bpmObj;
 
-OscIn oin; // class to handle OSC message receiving
+OscIn oin;
 OscMsg msg; // where the OSC message will be stored
 oscObj.oscPort => oin.port; // port to listen for OSC messages
 oin.listenAll(); // listen for all OSC messages rather than ones with specific address's
 
 public class interfaceEnable
 {
-	static int rhythm1Enabled; // if true rhythm1 is enabled and does processing and MIDI message sending
-	static int rhythm2Enabled; // same for rhythm2
-
-	static int intervalsEnabled; // same for the intervals voice
+    // used as bool (no boolean type)
+	static int rhythm1Enabled;
+	static int rhythm2Enabled;
+	static int intervalsEnabled;
 
 	// need to get the status of the interface Rhythm CA multibutton to the CA cells being used in CARhythm.ck but want to keep all the interface stuff here
-	// chuck doesn't support static arrays so an array couldn't be shared between objects
-	// the workaround is to treat the interface object as displaying a binary number and store the base 10 equivalent in the below int
-	// rhythm[1/2]Enabled is set to tell the functions in CARhythm.ck whether or not to use that total
-	// when it should use it, the base 10 number is converted back to binary and stored in the relevant CA array
+	// Chuck doesn't support static arrays so an array couldn't be shared between objects.
+	// Workaround is to treat the interface object as displaying a binary number and store the base 10 equivalent in RhythmCAInterfaceTotal
+	// rhythm[1/2]Enabled and useRhythmCATotal[1/2] set whether or not to actually use that representation
+	// when it uses it, the base 10 number is converted back to binary and stored in the relevant CA array
 	
-	static int RhythmCAInterfaceTotal; // stores the base 10 equivalent of the Rhythm CA array
-	static int useRhythmCATotal1; // flag for whether CARhythm rhy1 function should actually use the above total to assign to the CA cells
-	static int useRhythmCATotal2; // flag for whether CARhythm rhy2 function should actually use the above total to assign to the CA cells
+	static int RhythmCAInterfaceTotal;
+	static int useRhythmCATotal1;
+	static int useRhythmCATotal2;
 
 
-	// same problem with static arrays for Rhythm Mask but since want base 10 numbers from the interface can't got storing it as a single number
-	// instead have to have 8 separate ints
-	// initialised as -1 as means that rule won't be used for the CA mask
+	// same problem with static arrays for Rhythm Mask but since need base 10 numbers from the interface can't store it as a single number
+	// instead have to have 8 separate ints initialised as -1 as means that rule won't be used for the CA mask
 	-1 => static int maskCell0;
 	-1 => static int maskCell1;
 	-1 => static int maskCell2;
@@ -40,7 +39,7 @@ public class interfaceEnable
 	-1 => static int maskCell6;
 	-1 => static int maskCell7;
 
-	static int useMaskCells1; // flat whether to use the values stored above
+	static int useMaskCells1;
 	static int useMaskCells2;
 }
 
@@ -105,13 +104,13 @@ while (true)
 		}
 		else if (msg.address == "/1/toggleRhythm1")
 		{
-			if (Std.ftoi(msg.getFloat(0)) == 1) // button sends a 1 when "pressed down". Sends it as a float but convert it to int since comparing floats can get messy
+			if (Std.ftoi(msg.getFloat(0)) == 1) // button sends a 1 when "pressed down"
 			{
-				true => interfaceEnable.rhythm1Enabled; // in that case we enable rhythm 1 
+				true => interfaceEnable.rhythm1Enabled;
 			}
 			else
 			{
-				false => interfaceEnable.rhythm1Enabled; // if it wasn't a 1 then rhythm1 shouldn't be enabled
+				false => interfaceEnable.rhythm1Enabled;
 			}
 		}
 		else if (msg.address == "/1/toggleRhythm2")

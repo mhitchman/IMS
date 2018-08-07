@@ -1,4 +1,4 @@
-// keeps track of te tempo and value of note lengths globally
+// keeps track of the tempo and value of note lengths globally
 // based off example code in 'Programming For Musicians and Digital Artists
 public class BPM
 {
