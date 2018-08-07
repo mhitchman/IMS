@@ -1,4 +1,4 @@
-#+TITLE: Interactive Music Systems UG3 
+#+TITLE: Interactive Music System
 #+AUTHOR: Matthew Hitchman
 * Introduction
 The project procedurally generates music. Two rhythm voices are generated using one dimensional cellular automata. 
